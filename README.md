@@ -2,13 +2,13 @@ Requirements
 ============
 - Docker for Desktop with Kubernetes enabled : latest version
 - nginx ingress controller must be installed in the kubernetes cluster.  
-  Additional information available here: https://kubernetes.github.io/ingress-nginx/deploy/#docker-desktop
+  Additional information available here: https://kubernetes.github.io/ingress-nginx/deploy/#docker-desktop  
     `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml`
 - cert manager must be installed in the kubernetes cluster:  
-  Additional information available here: https://cert-manager.io/docs/installation/kubernetes/
+  Additional information available here: https://cert-manager.io/docs/installation/kubernetes/  
     `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml`
 - some versions of docker-for-desktop will automatically add an entry into your /etc/hosts file for kubernetes.docker.internal. If that entry doesn't already exist in your hosts file you will need to add it.
-    `127.0.0.1       kubernetes.docker.internal`
+    ```127.0.0.1       kubernetes.docker.internal```
 note: use caution, this will deploy to whatever your current namespace is.
 
 To Deploy This Code
