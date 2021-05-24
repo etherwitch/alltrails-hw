@@ -9,7 +9,10 @@ Requirements
     `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml`
 - some versions of docker-for-desktop will automatically add an entry into your /etc/hosts file for kubernetes.docker.internal. If that entry doesn't already exist in your hosts file you will need to add it.
     ```127.0.0.1       kubernetes.docker.internal```
-note: use caution, this will deploy to whatever your current namespace is.
+
+Warning
+=======
+Use caution, this will deploy to whatever your current namespace is.
 
 To Deploy This Code
 ===================
@@ -17,10 +20,13 @@ To Deploy This Code
 
 To Test This Code
 =================
-##Is it up?
+
+Is it up
+--------
 You can verify that everything is working just by pointing your web browser at https://kubernetes.docker.internal/nav or https://kubernetes.docker.internal/authn. The placeholder pods that respond will simply reply with what they are supposed to be.
 
-##Auto scaling?
+Will it scale
+-------------
 You can test the auto-scaling of the nav pod by putting load on it:
 
     while true; do curl -k https://kubernetes.docker.local/nav; done
