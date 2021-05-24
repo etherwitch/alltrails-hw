@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nav
+  labels:
+    app: alltrails
+    function: nav
+spec:
+  #replicas: 2
+  selector:
+    matchLabels:
+      function: nav
+  template:
+    metadata:
+      labels:
+        function: nav
+    spec:
+      containers:
+      - name: nav
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "200Mi"
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+        image: alpine
+        command:
+          - '/bin/sh'
+        args: 
+          - '-c'
+          - 'apk add netcat-openbsd && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n $RESP"|nc -l -p 3500; done'
+        env:
+            - name: RESP
+              value: 'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nNav Server\r\n'
+        ports:
+        - containerPort: 3500

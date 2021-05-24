@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: authn
+  labels:
+    app: alltrails
+spec:
+  type: NodePort # in a real k8s env this would be ClusterIP but we need NodePort for docker-for-desktop 
+  ports:
+  - name: authn-api
+    protocol: TCP
+    port: 3000
+    targetPort: 3000
+  selector:
+    function: authn

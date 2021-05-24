@@ -1,0 +1,30 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: dummy-ca
+    ingress.kubernetes.io/rewrite-target: /
+  name: nav
+spec:
+  rules:
+  - host: kubernetes.docker.internal
+    http:
+      paths:
+      - pathType: Prefix
+        path: /authn
+        backend:
+          service:
+            name: authn
+            port: 
+              number: 3000
+      - pathType: Prefix
+        path: /nav
+        backend:
+          service:
+            name: nav
+            port: 
+              number: 3500
+  tls:
+  - hosts:
+    - kubernetes.docker.internal
+    secretName: nav-app-cert

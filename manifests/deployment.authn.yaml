@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authn
+  labels:
+    app: alltrails
+    function: authn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      function: authn
+  template:
+    metadata:
+      labels:
+        function: authn
+    spec:
+      containers:
+      - name: authn
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "200Mi"
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+        image: alpine
+        command:
+          - '/bin/sh'
+        args: 
+          - '-c'
+          - 'apk add netcat-openbsd && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n $RESP"|nc -l -p 3000; done'
+            #- 'apk add netcat-openbsd && echo starting server && while { echo -en "$RESP"; } | nc -l "${1:-3000}"; do echo "========"; done'
+        env:
+            - name: RESP
+              value: 'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nAuthentication Server\r\n'
+        ports:
+        - containerPort: 3000

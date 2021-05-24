@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nav
+  labels:
+    app: alltrails
+spec:
+  type: NodePort # in a real k8s env this would be ClusterIP but we need NodePort for docker-for-desktop 
+  ports:
+  - name: nav-api
+    protocol: TCP
+    port: 3500
+    targetPort: 3500
+  selector:
+    function: nav
