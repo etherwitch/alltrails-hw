@@ -6,7 +6,6 @@ metadata:
     app: alltrails
     function: nav
 spec:
-  #replicas: 2
   selector:
     matchLabels:
       function: nav
@@ -26,12 +25,7 @@ spec:
             memory: "100Mi"
         image: alpine
         command:
-          - '/bin/sh'
-        args: 
-          - '-c'
-          - 'apk add netcat-openbsd && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n $RESP"|nc -l -p 3500; done'
-        env:
-            - name: RESP
-              value: 'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nNav Server\r\n'
-        ports:
-        - containerPort: 3500
+        - '/bin/sh'
+        args:
+        - '-c'
+        - 'apk add netcat-openbsd stress-ng && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n Nav Server $(stress-ng --matrix 1 --timeout 1)"|nc -l -q 0 -p 3500; done'

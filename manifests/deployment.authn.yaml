@@ -26,13 +26,12 @@ spec:
             memory: "100Mi"
         image: alpine
         command:
-          - '/bin/sh'
+        - '/bin/sh'
         args: 
-          - '-c'
-          - 'apk add netcat-openbsd && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n $RESP"|nc -l -p 3000; done'
-            #- 'apk add netcat-openbsd && echo starting server && while { echo -en "$RESP"; } | nc -l "${1:-3000}"; do echo "========"; done'
+        - '-c'
+        - 'apk add netcat-openbsd stress-ng && echo starting server && while true; do echo -e "HTTP/1.1 200 OK\n\n Authentication Server"|nc -l -q 0 -p 3000; done'
         env:
-            - name: RESP
-              value: 'HTTP/1.1 200 OK\r\nConnection: close\r\n\r\nAuthentication Server\r\n'
+        - name: RESP
+          value: 'Authentication Server\r\n'
         ports:
         - containerPort: 3000

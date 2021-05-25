@@ -1,63 +1,52 @@
 Requirements
 ============
-- Docker for Desktop with Kubernetes enabled : latest version
-- nginx ingress controller must be installed in the kubernetes cluster.  
+- Latest version of Docker for Desktop with Kubernetes enabled.
+- Nginx ingress controller installed in the Docker for Desktop Kubernetes cluster.  
   Additional information available here: https://kubernetes.github.io/ingress-nginx/deploy/#docker-desktop  
-    `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml`
-- cert manager must be installed in the kubernetes cluster:  
+  `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml`
+- Cert Manager Installed in the Kubernetes cluster:  
   Additional information available here: https://cert-manager.io/docs/installation/kubernetes/  
-    `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml`
-- some versions of docker-for-desktop will automatically add an entry into your /etc/hosts file for kubernetes.docker.internal. If that entry doesn't already exist in your hosts file you will need to add it.
+  `kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml`
+- Entry for kubernetes.docker.internal in your /etc/hosts file pointing to localhost. Note that some versions of Docker For Desktop will automatically add this entry into your /etc/hosts.
     ```127.0.0.1       kubernetes.docker.internal```
 
 Warning
 =======
-Use caution, this will deploy to whatever your current namespace is.
+As these manifests do not specify a namespace, this will deploy to whatever your current namespace is. I recommend creating a test namespace and updating your Kubernetes context.
 
-To Deploy This Code
-===================
-    cd alltrails-hw/manifests && kubectl apply -f ./
+    kubectl create ns alltrails-hw
+    kubectl config set-context --current --namespace=alltrails-hw
+
+TLDR;
+=====
+    sudo sh -c 'echo "127.0.0.1 kubernetes.docker.internal" >>/etc/hosts'
+    kubectl apply -f https://github.com/jetstack/cert-manager/releases/download/v1.3.1/cert-manager.yaml
+    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.46.0/deploy/static/provider/cloud/deploy.yaml
+    kubectl apply -f alltrails-hw/manifests
 
 To Test This Code
 =================
-
-Is it up
---------
-You can verify that everything is working just by pointing your web browser at https://kubernetes.docker.internal/nav or https://kubernetes.docker.internal/authn. The placeholder pods that respond will simply reply with what they are supposed to be.
-
-Will it scale
--------------
-You can test the auto-scaling of the nav pod by putting load on it:
-
-    while true; do curl -k https://kubernetes.docker.local/nav; done
-
-in another window monitor the pods to watch the nav-pod autoscale
-
-    watch kubectl get pods
+You can verify that everything is working just by pointing your web browser at https://kubernetes.docker.internal/nav or https://kubernetes.docker.internal/authn. The placeholder pods that respond will simply reply with what they are supposed to be. Note that because we're using a basic cert manager, the browser will give a certificate security warning.
 
 What is happening here
 ======================
-Inbound traffic is handled by the nginx ingress-controller. The ingress controller terminates SSL and passes the unencrypted traffic on to the backing-services "nav" and "authn" routing to the two services based on what path is provided: either https://kubernetes.docker.local/nav or https://kubernetes.docker.local/authn. SSL (tls) certificate management is accomplished through the cert-manager tool for kubernetes. It can do much more powerful things like auto-provisioning certificates from cloud providers. Finally, the cluster has rules in place that will auto-scale the nav service up as it comes under more CPU load.
+Inbound traffic is handled by the nginx ingress-controller. The ingress controller terminates SSL and passes the unencrypted traffic on to the backing-services called "nav" and "authn." Proper reverse-proxying to the two services is based on what path is provided: either https://kubernetes.docker.local/nav or https://kubernetes.docker.local/authn respectively. SSL (tls) certificate management is accomplished through the Cert Manager tool for Kubernetes. Finally, the cluster has rules in place that will auto-scale the nav service up as it comes under more CPU load.
+
+What doesn't work in Docker for Desktop 
+=======================================
+- I implemented a horizontal pod autoscaler on the nav container but the Kubernetes Metrics Server is required for it to work. Unfortunately Metrics Server and Docker for Desktop don't play well together so despite the autoscaler code being applied, scaling won't work.
+- I created a sample network policy as well but network policies require a CNI that can handle them. Caleco is capable of doing that but again, it isn't super simple to install on Docker for Desktop's kubernetes so while the code is included, it is ignored.
 
 Improvements
 ============
 - use client-cert authentication to secure SSL traffic between the ingress controller and the services
 - assuming there is going to be stateful data, we should consider backup and recovery paths
 - usually raw secrets would NOT be kept unencrypted as the CA key+cert are in this repo. SOPS is a good tool for encrypting secrets in situ.
-- monitoring!
-
-ToDo
-====
-- scaling
-- RBAC
-- nginx equiv conf file
-- normalize formatting of files
+- monitoring via prometheus or similar monitoring stacks
+- These manifests don't take RBAC into account but that would be an important consideration in a production environment.
 
 Reference
 =========
-
-## ingress example from cert-manager docs
-https://cert-manager.io/docs/usage/ingress/
 
 ## Generating CA key+crt
     openssl genrsa -out ca.key 2048
