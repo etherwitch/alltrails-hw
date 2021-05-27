@@ -29,6 +29,7 @@ To Test This Code
 You can verify that everything is working just by pointing your web browser at https://kubernetes.docker.internal/nav or https://kubernetes.docker.internal/authn. The placeholder pods that respond will simply reply with what they are supposed to be. Note that because we're using a basic cert manager, the browser will give a certificate security warning.
 
 You can also test via curl
+
     curl -k https://kubernetes.docker.internal/nav #connects to nav server via nginx ingress object
     curl -k https://kubernetes.docker.internal/authn #connects to authn server via nginx ingress object
     curl -k https://kubernetes.docker.internal:4439/nav #connects to nav server via nginx reverse proxy pod
