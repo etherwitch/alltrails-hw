@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-rp
+  labels:
+    app: alltrails
+    function: nginx-rp
+spec:
+  selector:
+    matchLabels:
+      function: nginx-rp
+  template:
+    metadata:
+      labels:
+        function: nginx-rp
+    spec:
+      volumes:
+      - name: nginx-crt
+        secret:
+          secretName: nginx-tls
+          items:
+          - key: tls.crt
+            path: tls.crt
+      - name: nginx-key
+        secret:
+          secretName: nginx-tls
+          items:
+          - key: tls.key
+            path: tls.key
+      containers:
+      - name: nav
+        volumeMounts:
+          - name: nginx-crt
+            mountPath: /nginx-certs/tls.crt
+            subPath: tls.crt
+            readOnly: true
+          - name: nginx-key
+            mountPath: /nginx-certs/tls.key
+            subPath: tls.key
+            readOnly: true
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "200Mi"
+          requests:
+            cpu: "250m"
+            memory: "100Mi"
+        image: etherwitch/nginx-rp
+        command:
+        - '/usr/sbin/nginx'
+        ports:
+        - containerPort: 80
+        - containerPort: 443

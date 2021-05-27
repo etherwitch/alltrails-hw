@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx
+  labels:
+    app: alltrails
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    protocol: TCP
+    port: 8099
+    targetPort: 80
+  - name: https
+    protocol: TCP
+    port: 4439
+    targetPort: 443
+  selector:
+    function: nginx-rp
